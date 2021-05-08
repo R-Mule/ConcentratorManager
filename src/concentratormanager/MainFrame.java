@@ -32,6 +32,16 @@ public class MainFrame extends javax.swing.JFrame {
     private JTextField textField = new JTextField(10);
     JLabel employeeSelectionHeader = new JLabel("Active Clerk: NONE", SwingConstants.LEFT);
     Employee activeEmployee;
+    //05/07/2021 creating strings for formatted JButton labels
+    String addConcentratorButtonText = "Add\nConcentrator";
+    String deleteConcentratorButtonText = "Delete\nConcentrator";
+    String showConcentratorLogButtonText = "Show\nConcentrator\nLog";
+    String editConcentratorButtonText = "Edit\nConcentrator";
+    //05/07/2021 adding concentrator utility buttons with labels:
+    JButton addConcentratorButton = new JButton("<html>" + addConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
+    JButton deleteConcentratorButton = new JButton("<html>" + deleteConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
+    JButton showConcentratorLogButton = new JButton("<html>" + showConcentratorLogButtonText.replaceAll("\\n", "<br>") + "</html>");
+    JButton editConcentratorButton = new JButton("<html>" + editConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
     
     public MainFrame() {
         init();
@@ -70,6 +80,33 @@ public class MainFrame extends javax.swing.JFrame {
         
         
         //TODO Add Concentrator, Delete Concentrator, Show Concentrator Log, Edit Concentrator
+        //This creates the addConcentratorButton
+        addConcentratorButton.setLocation(1320,100);
+        addConcentratorButton.setSize(100,100);
+        addConcentratorButton.setBackground(new Color(143, 247, 122));
+        addConcentratorButton.setVisible(true);
+        this.add(addConcentratorButton);
+        
+        //This creates the deleteConcentratorButton
+        deleteConcentratorButton.setLocation(1420,100);
+        deleteConcentratorButton.setSize(100,100);
+        deleteConcentratorButton.setBackground(new Color(247, 122, 131));
+        deleteConcentratorButton.setVisible(true);
+        this.add(deleteConcentratorButton);
+        
+        //This creates the showConcentratorLogButton
+        showConcentratorLogButton.setLocation(1520,100);
+        showConcentratorLogButton.setSize(100,100);
+        showConcentratorLogButton.setBackground(new Color(101, 228, 242));
+        showConcentratorLogButton.setVisible(true);
+        this.add(showConcentratorLogButton);
+        
+        //This creates the editConcentratorButton
+        editConcentratorButton.setLocation(1620,100);
+        editConcentratorButton.setSize(100,100);
+        editConcentratorButton.setBackground(new Color(251, 255, 140));
+        editConcentratorButton.setVisible(true);
+        this.add(editConcentratorButton);
         
         
         
