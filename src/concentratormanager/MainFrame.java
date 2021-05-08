@@ -53,18 +53,26 @@ public class MainFrame extends javax.swing.JFrame {
         this.add(versionHeader);
         this.setTitle("Smith's Concentrator Manager - Developed by: Andrew & Hollie Smith");
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
         //This creates the clerkLoginButton
         clerkLoginButton.setLocation(10, 920);
         clerkLoginButton.setSize(100, 40);
         clerkLoginButton.setBackground(new Color(0, 255, 0));
+        clerkLoginButton.setVisible(true);
+        this.add(clerkLoginButton);
+        
         //This creates the clerkLogoutButton
         clerkLogoutButton.setLocation(120, 950);
         clerkLogoutButton.setSize(150, 40);
         clerkLogoutButton.setBackground(new Color(255, 0, 0));
         clerkLogoutButton.setVisible(false);
-        clerkLoginButton.setVisible(true);
         this.add(clerkLogoutButton);
-        this.add(clerkLoginButton);
+        
+        
+        //TODO Add Concentrator, Delete Concentrator, Show Concentrator Log, Edit Concentrator
+        
+        
+        
         employeeSelectionHeader.setBounds(120, 925, 400, 30);
         employeeSelectionHeader.setVisible(true);
         this.add(employeeSelectionHeader);
