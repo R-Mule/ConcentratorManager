@@ -3,9 +3,9 @@ package concentratormanager;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,6 +27,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private JLabel versionHeader = new JLabel("Version 1.0", SwingConstants.LEFT);
     Timer timer;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
     private JTextField textField = new JTextField(10);
@@ -42,7 +43,7 @@ public class MainFrame extends javax.swing.JFrame {
     JButton deleteConcentratorButton = new JButton("<html>" + deleteConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
     JButton showConcentratorLogButton = new JButton("<html>" + showConcentratorLogButtonText.replaceAll("\\n", "<br>") + "</html>");
     JButton editConcentratorButton = new JButton("<html>" + editConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
-    
+
     public MainFrame() {
         init();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -63,53 +64,50 @@ public class MainFrame extends javax.swing.JFrame {
         this.add(versionHeader);
         this.setTitle("Smith's Concentrator Manager - Developed by: Andrew & Hollie Smith");
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
+
         //This creates the clerkLoginButton
         clerkLoginButton.setLocation(10, 920);
         clerkLoginButton.setSize(100, 40);
         clerkLoginButton.setBackground(new Color(0, 255, 0));
         clerkLoginButton.setVisible(true);
         this.add(clerkLoginButton);
-        
+
         //This creates the clerkLogoutButton
         clerkLogoutButton.setLocation(120, 950);
         clerkLogoutButton.setSize(150, 40);
         clerkLogoutButton.setBackground(new Color(255, 0, 0));
         clerkLogoutButton.setVisible(false);
         this.add(clerkLogoutButton);
-        
-        
+
         //TODO Add Concentrator, Delete Concentrator, Show Concentrator Log, Edit Concentrator
         //This creates the addConcentratorButton
-        addConcentratorButton.setLocation(1320,100);
-        addConcentratorButton.setSize(100,100);
+        addConcentratorButton.setLocation(1320, 100);
+        addConcentratorButton.setSize(100, 100);
         addConcentratorButton.setBackground(new Color(143, 247, 122));
         addConcentratorButton.setVisible(true);
         this.add(addConcentratorButton);
-        
+
         //This creates the deleteConcentratorButton
-        deleteConcentratorButton.setLocation(1420,100);
-        deleteConcentratorButton.setSize(100,100);
+        deleteConcentratorButton.setLocation(1420, 100);
+        deleteConcentratorButton.setSize(100, 100);
         deleteConcentratorButton.setBackground(new Color(247, 122, 131));
         deleteConcentratorButton.setVisible(true);
         this.add(deleteConcentratorButton);
-        
+
         //This creates the showConcentratorLogButton
-        showConcentratorLogButton.setLocation(1520,100);
-        showConcentratorLogButton.setSize(100,100);
+        showConcentratorLogButton.setLocation(1520, 100);
+        showConcentratorLogButton.setSize(100, 100);
         showConcentratorLogButton.setBackground(new Color(101, 228, 242));
         showConcentratorLogButton.setVisible(true);
         this.add(showConcentratorLogButton);
-        
+
         //This creates the editConcentratorButton
-        editConcentratorButton.setLocation(1620,100);
-        editConcentratorButton.setSize(100,100);
+        editConcentratorButton.setLocation(1620, 100);
+        editConcentratorButton.setSize(100, 100);
         editConcentratorButton.setBackground(new Color(251, 255, 140));
         editConcentratorButton.setVisible(true);
         this.add(editConcentratorButton);
-        
-        
-        
+
         employeeSelectionHeader.setBounds(120, 925, 400, 30);
         employeeSelectionHeader.setVisible(true);
         this.add(employeeSelectionHeader);
@@ -123,7 +121,6 @@ public class MainFrame extends javax.swing.JFrame {
                 {
                     "Enter Passcode:", field1
                 };
-
 
                 int option = JOptionPane.showConfirmDialog(textInputFrame, message, "Employee Login Menu", JOptionPane.OK_CANCEL_OPTION);
                 if (option == JOptionPane.OK_OPTION)
@@ -151,7 +148,7 @@ public class MainFrame extends javax.swing.JFrame {
                                     }
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -178,22 +175,28 @@ public class MainFrame extends javax.swing.JFrame {
             "Last Modified"
         };
         //TODO needs loaded from Database..
-        Object[][] data =
+        ArrayList<Concentrator> concentrators = Database.getConcentrators();
+        //Object[][] data = new Object[concentrators.size()][];
+        int conCntr = 0;
+        Object[][] data = new Object[concentrators.size()][7];
+        for (Concentrator c : concentrators)
         {
+            if (!c.archived)
             {
-                "1234", "Invacare", "Perfecto 2", new Integer(5), new Integer(10), "Home", new Date()
-            },
-            {
-                "1234", "Invacare", "Perfecto 2", new Integer(5), new Integer(10), "Home", new Date()
-            },
-            {
-                "1234", "Invacare", "Perfecto 2", new Integer(5), new Integer(10), "Home", new Date()
-            },
-            {
-                "1234", "Invacare", "Perfecto 2", new Integer(5), new Integer(10), "Home", new Date()
-            },
+                ConcentratorData cd = c.getLatestLog();
+                data[conCntr][0] = c.serialNumber;
+                data[conCntr][1] = c.make;
+                data[conCntr][2] = c.model;
+                data[conCntr][3] = cd.currentHours;
+                data[conCntr][4] = cd.nextMaintHours;
+                data[conCntr][5] = cd.location;
+                data[conCntr][6] = cd.modificationDate.format(formatter);
+            }
+            conCntr++;
+        }
 
-        };
+
+
         JTable table = new JTable(data, columnNames);
         table.setSize(1200, 1000);
         JScrollPane scrollPane = new JScrollPane(table);
@@ -202,7 +205,7 @@ public class MainFrame extends javax.swing.JFrame {
         scrollPane.setSize(1200, 800);
         scrollPane.setLocation(100, 100);
         TableColumn column = null;
-        table.setModel(new NonEditableTableModel(data,columnNames));
+        table.setModel(new NonEditableTableModel(data, columnNames));
         for (int i = 0; i < 7; i++)
         {
             column = table.getColumnModel().getColumn(i);
@@ -216,7 +219,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
 
         }
-        
+
         table.setAutoCreateRowSorter(true);
         table.setRowSelectionAllowed(true);
         table.getTableHeader().setReorderingAllowed(false);
@@ -239,7 +242,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         pack();
     }
-    
+
     protected boolean validateInteger(String integer) {
         try
         {

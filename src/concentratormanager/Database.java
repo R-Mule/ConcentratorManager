@@ -60,6 +60,54 @@ public class Database {
         return null;
     }
 
+        public static ArrayList<Concentrator> getConcentrators() {
+        try
+        {
+            ArrayList<Concentrator> concentrators = new ArrayList<>();
+            // ArrayList<String> data = new ArrayList<>();
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from concentrators order by pid asc,serialNumber;");
+            while (rs.next())
+            {
+                concentrators.add(new Concentrator( rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
+            }//end while
+            con.close();
+            return concentrators;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return null;
+    }
+        
+        public static ArrayList<ConcentratorData> getConcentratorLogBySerialNumber(String serialNumber) {
+        try
+        {
+            ArrayList<ConcentratorData> concentratorLog = new ArrayList<>();
+            // ArrayList<String> data = new ArrayList<>();
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from concentratorLog where serialNumber = '" + serialNumber + "' order by modificationTime;");
+            while (rs.next())
+            {
+                concentratorLog.add(new ConcentratorData(rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getTimestamp(6).toLocalDateTime()));
+            }//end while
+            con.close();
+            return concentratorLog;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return null;
+    }
+        
     public static ArrayList<Employee> getEmployeesListSortByPID() {
         ArrayList<Employee> employees = new ArrayList<>();
         try
