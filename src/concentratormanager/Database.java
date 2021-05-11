@@ -1,13 +1,10 @@
 package concentratormanager;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-
 import java.sql.Statement;
 import java.util.ArrayList;
-
 
 /**
 
@@ -35,7 +32,6 @@ public class Database {
         password = ConfigFileReader.getPassword();
     }
 
-
     public static String getEmployeesSortByPID() {
         try
         {
@@ -60,7 +56,24 @@ public class Database {
         return null;
     }
 
-        public static ArrayList<Concentrator> getConcentrators() {
+    public static void archiveConcentrator(String serialNumber) {
+                try
+        {
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+
+                Statement stmt = con.createStatement();
+                stmt.executeUpdate("UPDATE `concentrators` set archived = " + true + " where serialNumber = '" + serialNumber + "';");
+            con.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+
+    public static ArrayList<Concentrator> getConcentrators() {
         try
         {
             ArrayList<Concentrator> concentrators = new ArrayList<>();
@@ -69,10 +82,10 @@ public class Database {
             Connection con = DriverManager.getConnection(
                     host, userName, password);
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from concentrators order by pid asc,serialNumber;");
+            ResultSet rs = stmt.executeQuery("select * from concentrators order by archived;");
             while (rs.next())
             {
-                concentrators.add(new Concentrator( rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
+                concentrators.add(new Concentrator(rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
             }//end while
             con.close();
             return concentrators;
@@ -83,8 +96,8 @@ public class Database {
         }
         return null;
     }
-        
-        public static ArrayList<ConcentratorData> getConcentratorLogBySerialNumber(String serialNumber) {
+
+    public static ArrayList<ConcentratorData> getConcentratorLogBySerialNumber(String serialNumber) {
         try
         {
             ArrayList<ConcentratorData> concentratorLog = new ArrayList<>();
@@ -107,7 +120,7 @@ public class Database {
         }
         return null;
     }
-        
+
     public static ArrayList<Employee> getEmployeesListSortByPID() {
         ArrayList<Employee> employees = new ArrayList<>();
         try
@@ -195,7 +208,7 @@ public class Database {
         return emp;
     }//end getTicketFromDatabase
 
-public static String getEmployeeNameByCode(int code) {
+    public static String getEmployeeNameByCode(int code) {
 
         try
         {

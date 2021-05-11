@@ -18,6 +18,7 @@ public class Concentrator {
         this.serialNumber = serialNumber;
         this.make = make;
         this.model = model;
+        this.archived = archived;
         this.logData = Database.getConcentratorLogBySerialNumber(this.serialNumber);
     }
     
