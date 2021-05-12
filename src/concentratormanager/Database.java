@@ -56,23 +56,6 @@ public class Database {
         return null;
     }
 
-    public static void archiveConcentrator(String serialNumber) {
-                try
-        {
-            Class.forName(driverPath);
-            Connection con = DriverManager.getConnection(
-                    host, userName, password);
-
-                Statement stmt = con.createStatement();
-                stmt.executeUpdate("UPDATE `concentrators` set archived = " + true + " where serialNumber = '" + serialNumber + "';");
-            con.close();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e);
-        }
-    }
-
     public static ArrayList<Concentrator> getConcentrators() {
         try
         {
@@ -82,10 +65,10 @@ public class Database {
             Connection con = DriverManager.getConnection(
                     host, userName, password);
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from concentrators order by archived;");
+            ResultSet rs = stmt.executeQuery("select * from concentrators;");
             while (rs.next())
             {
-                concentrators.add(new Concentrator(rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
+                concentrators.add(new Concentrator(rs.getString(2), ConcentratorMake.getByName(rs.getString(3)), ConcentratorModel.getByName(rs.getString(4))));
             }//end while
             con.close();
             return concentrators;
@@ -97,6 +80,29 @@ public class Database {
         return null;
     }
 
+    public static boolean doesConcentratorExist(String serialNumber) {
+        try
+        {
+            boolean found = false;
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from concentrators where serialNumber = '"+ serialNumber + "';");
+            while (rs.next())
+            {
+                found  = true;
+            }//end while
+            con.close();
+            return found;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return false;
+    }
+    
     public static ArrayList<ConcentratorData> getConcentratorLogBySerialNumber(String serialNumber) {
         try
         {
@@ -109,7 +115,7 @@ public class Database {
             ResultSet rs = stmt.executeQuery("select * from concentratorLog where serialNumber = '" + serialNumber + "' order by modificationTime;");
             while (rs.next())
             {
-                concentratorLog.add(new ConcentratorData(rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getTimestamp(6).toLocalDateTime()));
+                concentratorLog.add(new ConcentratorData(rs.getInt(3), rs.getInt(4), ConcentratorState.getByName(rs.getString(5)), rs.getString(6), rs.getTimestamp(7).toLocalDateTime(),rs.getString(8)));
             }//end while
             con.close();
             return concentratorLog;

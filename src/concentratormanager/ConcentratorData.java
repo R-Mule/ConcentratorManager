@@ -11,13 +11,18 @@ public class ConcentratorData {
     LocalDateTime modificationDate;
     int currentHours;
     int nextMaintHours;
-    String location;
+    ConcentratorState location;
+    String locationDesc;
+    String loggedByEmployee;
     
-    public ConcentratorData(int currentHours, int nextMainHours, String location, LocalDateTime modificationDateTime)
+    public ConcentratorData(int currentHours, int nextMainHours, ConcentratorState location, String locationDesc, LocalDateTime modificationDateTime, String loggedByEmployee)
     {
         this.modificationDate = modificationDateTime;
         this.currentHours = currentHours;
         this.nextMaintHours = nextMainHours;
         this.location = location;
+        this.loggedByEmployee = loggedByEmployee;
     }
+    
+    
 }

@@ -25,6 +25,7 @@ public class MainFrame extends javax.swing.JFrame {
     private JLabel versionHeader = new JLabel("Version 1.0", SwingConstants.LEFT);
     Timer timer;
     JTable table;
+    AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
@@ -32,12 +33,10 @@ public class MainFrame extends javax.swing.JFrame {
     Employee activeEmployee;
     //05/07/2021 creating strings for formatted JButton labels
     String addConcentratorButtonText = "Add\nConcentrator";
-    String deleteConcentratorButtonText = "Archive\nConcentrator";
     String showConcentratorLogButtonText = "Show\nConcentrator\nLog";
-    String editConcentratorButtonText = "Edit\nConcentrator";
+    String editConcentratorButtonText = "Update\nConcentrator";
     //05/07/2021 adding concentrator utility buttons with labels:
     JButton addConcentratorButton = new JButton("<html>" + addConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
-    JButton deleteConcentratorButton = new JButton("<html>" + deleteConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
     JButton showConcentratorLogButton = new JButton("<html>" + showConcentratorLogButtonText.replaceAll("\\n", "<br>") + "</html>");
     JButton editConcentratorButton = new JButton("<html>" + editConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
     final String[] COLUMN_NAMES =
@@ -48,8 +47,9 @@ public class MainFrame extends javax.swing.JFrame {
         "Current Hours",
         "Next Maintenance Hours",
         "Location",
+        "Location Description",
         "Last Modified",
-        "Archived"
+        "Last Logged By"
     };
 
     final int SERIAL_NUMBER = 0;
@@ -58,8 +58,9 @@ public class MainFrame extends javax.swing.JFrame {
     final int CURRENT_HOURS = 3;
     final int NEXT_MAINTENANCE_HOURS = 4;
     final int LOCATION = 5;
-    final int LAST_MODIFIED = 6;
-    final int ARCHIVED = 7;
+    final int LOCATION_DESCRIPTION = 6;
+    final int LAST_MODIFIED = 7;
+    final int LOGGED_BY_EMPLOYEE = 8;
 
     public MainFrame() {
         init();
@@ -98,28 +99,21 @@ public class MainFrame extends javax.swing.JFrame {
 
         //TODO Add Concentrator, Delete Concentrator, Show Concentrator Log, Edit Concentrator
         //This creates the addConcentratorButton
-        addConcentratorButton.setLocation(1320, 100);
+        addConcentratorButton.setLocation(1720, 100);
         addConcentratorButton.setSize(100, 100);
         addConcentratorButton.setBackground(new Color(143, 247, 122));
         addConcentratorButton.setVisible(true);
         this.add(addConcentratorButton);
 
-        //This creates the deleteConcentratorButton
-        deleteConcentratorButton.setLocation(1420, 100);
-        deleteConcentratorButton.setSize(100, 100);
-        deleteConcentratorButton.setBackground(new Color(247, 122, 131));
-        deleteConcentratorButton.setVisible(true);
-        this.add(deleteConcentratorButton);
-
         //This creates the showConcentratorLogButton
-        showConcentratorLogButton.setLocation(1520, 100);
+        showConcentratorLogButton.setLocation(1720, 200);
         showConcentratorLogButton.setSize(100, 100);
         showConcentratorLogButton.setBackground(new Color(101, 228, 242));
         showConcentratorLogButton.setVisible(true);
         this.add(showConcentratorLogButton);
 
         //This creates the editConcentratorButton
-        editConcentratorButton.setLocation(1620, 100);
+        editConcentratorButton.setLocation(1720, 300);
         editConcentratorButton.setSize(100, 100);
         editConcentratorButton.setBackground(new Color(251, 255, 140));
         editConcentratorButton.setVisible(true);
@@ -179,7 +173,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        deleteConcentratorButton.addActionListener(new java.awt.event.ActionListener() {
+        editConcentratorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (activeEmployee == null)
                 {
@@ -196,19 +190,28 @@ public class MainFrame extends javax.swing.JFrame {
                 }
 
                 String serialNumber = getSelectedConcentratorSerialNumber();
-                if (isSelectedConcentratorArchived())
+                if (isSelectedConcentratorRetired())
                 {
                     JFrame message1 = new JFrame("");
-                    JOptionPane.showMessageDialog(message1, "Concentrator already archived.");
+                    JOptionPane.showMessageDialog(message1, "Concentrator retired. No state changes allowed.");
+                    return;
+                }
+
+                //TODO
+                System.out.println();
+            }
+        });
+
+        addConcentratorButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (activeEmployee == null)
+                {
+                    JFrame message1 = new JFrame("");
+                    JOptionPane.showMessageDialog(message1, "You must login first.");
                     return;
                 }
                 
-                if (JOptionPane.showConfirmDialog(null, "Are you sure you wish to archive Concentrator with Serial #" + serialNumber + "?", "WARNING",
-                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-                {
-                    Database.archiveConcentrator(serialNumber);
-                    reloadConcentratorTable();
-                }
+                addConcentratorDialog.showDialog();
 
                 System.out.println();
             }
@@ -217,22 +220,19 @@ public class MainFrame extends javax.swing.JFrame {
         //Init Concentrator Table
         ArrayList<Concentrator> concentrators = Database.getConcentrators();
         int conCntr = 0;
-        Object[][] data = new Object[concentrators.size()][8];
+        Object[][] data = new Object[concentrators.size()][COLUMN_NAMES.length];
         for (Concentrator c : concentrators)
         {
-            //if (!c.archived)
-            //{
-
             ConcentratorData cd = c.getLatestLog();
             data[conCntr][SERIAL_NUMBER] = c.serialNumber;
-            data[conCntr][MAKE] = c.make;
-            data[conCntr][MODEL] = c.model;
+            data[conCntr][MAKE] = c.make.name;
+            data[conCntr][MODEL] = c.model.name;
             data[conCntr][CURRENT_HOURS] = cd.currentHours;
             data[conCntr][NEXT_MAINTENANCE_HOURS] = cd.nextMaintHours;
-            data[conCntr][LOCATION] = cd.location;
+            data[conCntr][LOCATION] = cd.location.name;
+            data[conCntr][LOCATION_DESCRIPTION] = cd.locationDesc;
             data[conCntr][LAST_MODIFIED] = cd.modificationDate.format(formatter);
-            data[conCntr][ARCHIVED] = c.archived ? "Yes" : "No";
-            //}
+            data[conCntr][LOGGED_BY_EMPLOYEE] = cd.loggedByEmployee;
             conCntr++;
         }
 
@@ -241,9 +241,9 @@ public class MainFrame extends javax.swing.JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
         this.add(scrollPane);
-        scrollPane.setSize(1200, 800);
+        scrollPane.setSize(1600, 800);
         scrollPane.setLocation(100, 100);
-        table.setSize(1200, 1000);
+        table.setSize(1600, 1000);
         TableColumn column = null;
 
         for (int i = 0; i < 7; i++)
@@ -309,11 +309,11 @@ public class MainFrame extends javax.swing.JFrame {
         return null;
     }
 
-    private boolean isSelectedConcentratorArchived() {
+    private boolean isSelectedConcentratorRetired() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1)
         {
-            return table.getModel().getValueAt(selectedRow, ARCHIVED).toString().contentEquals("Yes");
+            return table.getModel().getValueAt(selectedRow, LOCATION).toString().contentEquals(ConcentratorState.RETIRED.toString());
         }
         return false;
     }
@@ -329,13 +329,14 @@ public class MainFrame extends javax.swing.JFrame {
                 {
                     ConcentratorData cd = concentrators.get(c).getLatestLog();
                     table.getModel().setValueAt(concentrators.get(c).serialNumber, r, SERIAL_NUMBER);
-                    table.getModel().setValueAt(concentrators.get(c).make, r, MAKE);
-                    table.getModel().setValueAt(concentrators.get(c).model, r, MODEL);
+                    table.getModel().setValueAt(concentrators.get(c).make.name, r, MAKE);
+                    table.getModel().setValueAt(concentrators.get(c).model.name, r, MODEL);
                     table.getModel().setValueAt(cd.currentHours, r, CURRENT_HOURS);
                     table.getModel().setValueAt(cd.nextMaintHours, r, NEXT_MAINTENANCE_HOURS);
-                    table.getModel().setValueAt(cd.location, r, LOCATION);
+                    table.getModel().setValueAt(cd.location.name, r, LOCATION);
+                    table.getModel().setValueAt(cd.locationDesc, r, LOCATION_DESCRIPTION);
                     table.getModel().setValueAt(cd.modificationDate, r, LAST_MODIFIED);
-                    table.getModel().setValueAt(concentrators.get(c).archived ? "Yes" : "No", r, ARCHIVED);
+                    table.getModel().setValueAt(cd.loggedByEmployee, r, LOGGED_BY_EMPLOYEE);
                     found = true;
                 }
             }
@@ -351,7 +352,7 @@ public class MainFrame extends javax.swing.JFrame {
         ConcentratorData cd = c.getLatestLog();
         Object[] rowData =
         {
-            c.serialNumber, c.make, c.model, cd.currentHours, cd.nextMaintHours, cd.location, cd.modificationDate, c.archived ? "Yes" : "No"
+            c.serialNumber, c.make, c.model, cd.currentHours, cd.nextMaintHours, cd.location, cd.locationDesc, cd.modificationDate
         };
         tm.addRow(rowData);
     }

@@ -9,16 +9,14 @@ import java.util.ArrayList;
  */
 public class Concentrator {
     String serialNumber;
-    String make;
-    String model;
-    boolean archived;
+    ConcentratorMake make;
+    ConcentratorModel model;
     ArrayList<ConcentratorData> logData;
-    public Concentrator(String serialNumber, String make, String model, boolean archived)
+    public Concentrator(String serialNumber, ConcentratorMake make, ConcentratorModel model)
     {
         this.serialNumber = serialNumber;
         this.make = make;
         this.model = model;
-        this.archived = archived;
         this.logData = Database.getConcentratorLogBySerialNumber(this.serialNumber);
     }
     
