@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -30,6 +31,39 @@ public class Database {
         host = ConfigFileReader.getHostName();
         userName = ConfigFileReader.getUserName();
         password = ConfigFileReader.getPassword();
+    }
+
+    public static void addConcentrator(Concentrator concentrator) {
+        try
+        {
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO concentrators (pid,serialNumber,make,model) VALUES (NULL,'" + concentrator.serialNumber + "', '" + concentrator.make.name + "','" + concentrator.model.name + "')");
+            con.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }//end catch
+    }
+
+    public static void addConcentratorLog(String serialNumber, ConcentratorData cd) {
+        try
+        {
+            DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO concentratorLog (pid,serialNumber,currentHours,nextMaintHours,location,locationDesc,modificationTime,loggedByEmployee) VALUES (NULL,'" + serialNumber + "'," + cd.currentHours + "," + cd.nextMaintHours + ",'" + cd.location.name + "','" + cd.locationDesc + "','" + sdf.format(cd.modificationDate)+ "','" + cd.loggedByEmployee +"')");
+            con.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }//end catch
     }
 
     public static String getEmployeesSortByPID() {
@@ -80,6 +114,30 @@ public class Database {
         return null;
     }
 
+        public static Concentrator getConcentratorBySerialNumber(String serialNumber) {
+        try
+        {
+            Concentrator concentrator = null;
+            // ArrayList<String> data = new ArrayList<>();
+            Class.forName(driverPath);
+            Connection con = DriverManager.getConnection(
+                    host, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from concentrators where serialNumber = '"+ serialNumber +"';");
+            while (rs.next())
+            {
+                concentrator = new Concentrator(rs.getString(2), ConcentratorMake.getByName(rs.getString(3)), ConcentratorModel.getByName(rs.getString(4)));
+            }//end while
+            con.close();
+            return concentrator;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return null;
+    }
+        
     public static boolean doesConcentratorExist(String serialNumber) {
         try
         {
@@ -88,10 +146,10 @@ public class Database {
             Connection con = DriverManager.getConnection(
                     host, userName, password);
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from concentrators where serialNumber = '"+ serialNumber + "';");
+            ResultSet rs = stmt.executeQuery("select * from concentrators where serialNumber = '" + serialNumber + "';");
             while (rs.next())
             {
-                found  = true;
+                found = true;
             }//end while
             con.close();
             return found;
@@ -102,7 +160,7 @@ public class Database {
         }
         return false;
     }
-    
+
     public static ArrayList<ConcentratorData> getConcentratorLogBySerialNumber(String serialNumber) {
         try
         {
@@ -115,7 +173,7 @@ public class Database {
             ResultSet rs = stmt.executeQuery("select * from concentratorLog where serialNumber = '" + serialNumber + "' order by modificationTime;");
             while (rs.next())
             {
-                concentratorLog.add(new ConcentratorData(rs.getInt(3), rs.getInt(4), ConcentratorState.getByName(rs.getString(5)), rs.getString(6), rs.getTimestamp(7).toLocalDateTime(),rs.getString(8)));
+                concentratorLog.add(new ConcentratorData(rs.getInt(3), rs.getInt(4), ConcentratorState.getByName(rs.getString(5)), rs.getString(6), rs.getTimestamp(7).toLocalDateTime(), rs.getString(8)));
             }//end while
             con.close();
             return concentratorLog;

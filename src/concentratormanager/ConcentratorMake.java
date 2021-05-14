@@ -5,7 +5,7 @@ package concentratormanager;
  @author R-Mule
  */
 public enum ConcentratorMake {
-    INVACARE("Invacare");
+    INVACARE("Invacare"),DRIVE("Drive");
 
     public String name;
 
@@ -14,6 +14,8 @@ public enum ConcentratorMake {
         {
             case "Invacare":
                 return ConcentratorMake.INVACARE;
+            case "Drive":
+                return ConcentratorMake.DRIVE;
 
         }
         return null;

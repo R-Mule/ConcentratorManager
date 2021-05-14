@@ -22,22 +22,23 @@ import javax.swing.SpinnerDateModel;
 
  @author R-Mule
  */
-public class AddConcentratorDialog extends JDialog {
+public class UpdateConcentratorDialog extends JDialog {
 
     JButton saveButton = new JButton("Save");
     JButton cancelButton = new JButton("Cancel");
-    JTextField serialNumberTextField = new JTextField();
-    JComboBox makeComboBox = new JComboBox();
-    JComboBox modelComboBox = new JComboBox();
     JTextField currentHoursTextField = new JTextField();
     JTextField nextMaintHoursTextField = new JTextField();
     JComboBox locationComboBox = new JComboBox();
     JTextField locationDescTextField = new JTextField();
     JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
     MainFrame mf;
+    Concentrator concentrator;
+    JLabel serialNumberValueLabel = new JLabel("");
+    JLabel makeValueLabel = new JLabel("");
+    JLabel modelValueLabel = new JLabel("");
 
-    public AddConcentratorDialog(MainFrame mf) {
-        this.setTitle("Add Concentrator Menu");
+    public UpdateConcentratorDialog(MainFrame mf) {
+        this.setTitle("Update Concentrator Menu");
         JPanel pane = new JPanel();
         JLabel serialNumberLabel = new JLabel("Serial Number:");
         JLabel makeLabel = new JLabel("Make:");
@@ -70,16 +71,6 @@ public class AddConcentratorDialog extends JDialog {
                 closeDialog();
             }
         });
-
-        for (ConcentratorMake cm : ConcentratorMake.values())
-        {
-            makeComboBox.addItem(cm.name);
-        }
-
-        for (ConcentratorModel cm : ConcentratorModel.values())
-        {
-            modelComboBox.addItem(cm.name);
-        }
 
         for (ConcentratorState cs : ConcentratorState.values())
         {
@@ -114,11 +105,11 @@ public class AddConcentratorDialog extends JDialog {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 0;
-        pane.add(serialNumberTextField, c);
+        pane.add(serialNumberValueLabel, c);
         c.gridy = 1;
-        pane.add(makeComboBox, c);
+        pane.add(makeValueLabel, c);
         c.gridy = 2;
-        pane.add(modelComboBox, c);
+        pane.add(modelValueLabel, c);
         c.gridy = 3;
         pane.add(currentHoursTextField, c);
         c.gridy = 4;
@@ -138,13 +129,17 @@ public class AddConcentratorDialog extends JDialog {
 
     }
 
-    public void showDialog() {
+    public void showDialog(Concentrator concentrator) {
         JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "MM/dd/yy hh:mm:ss aa");
         timeSpinner.setEditor(timeEditor);
         timeSpinner.setValue(new Date());
-        currentHoursTextField.setText("0");
-        nextMaintHoursTextField.setText("10000");
-
+        ConcentratorData cd = concentrator.getLatestLog();
+        currentHoursTextField.setText(Integer.toString(cd.currentHours));
+        nextMaintHoursTextField.setText(Integer.toString(cd.nextMaintHours));
+        this.concentrator = concentrator;
+        this.serialNumberValueLabel.setText(concentrator.serialNumber);
+        this.makeValueLabel.setText(concentrator.make.name);
+        this.modelValueLabel.setText(concentrator.model.name);
         this.setVisible(true);
     }
 
@@ -153,29 +148,8 @@ public class AddConcentratorDialog extends JDialog {
     }
 
     public boolean validateSave() {
-        String serialNumber = serialNumberTextField.getText();
-        if (serialNumber.isEmpty() || Database.doesConcentratorExist(serialNumber))
-        {
-            JFrame message1 = new JFrame("");
-            JOptionPane.showMessageDialog(message1, "Serial Number is blank or already exists.");
-            return false;
-        }
+        ConcentratorData cd = this.concentrator.getLatestLog();
 
-        ConcentratorMake make = ConcentratorMake.getByName(makeComboBox.getSelectedItem().toString());
-        ConcentratorModel model = ConcentratorModel.getByName(modelComboBox.getSelectedItem().toString());
-        if (make == ConcentratorMake.DRIVE && (model == ConcentratorModel.PERFECTO_2 || model == ConcentratorModel.PLATINUM_MOBILE || model == ConcentratorModel.PLATINUM_XL_5))
-        {
-            JFrame message1 = new JFrame("");
-            JOptionPane.showMessageDialog(message1, "Invalid Make/Model combination.");
-            return false;
-        }
-
-        if (make == ConcentratorMake.INVACARE && model == ConcentratorModel.DEVILBISS)
-        {
-            JFrame message1 = new JFrame("");
-            JOptionPane.showMessageDialog(message1, "Invalid Make/Model combination.");
-            return false;
-        }
         String currentHoursText = currentHoursTextField.getText();
         String nextMaintHoursText = nextMaintHoursTextField.getText();
 
@@ -201,6 +175,19 @@ public class AddConcentratorDialog extends JDialog {
 
         int currentHours = Integer.parseInt(currentHoursText);
         int nextMaintHours = Integer.parseInt(nextMaintHoursText);
+        if (cd.currentHours > currentHours)
+        {
+            JFrame message1 = new JFrame("");
+            JOptionPane.showMessageDialog(message1, "Current Hours must be the same or larger than previously logged hours (" + cd.currentHours + ").");
+            return false;
+        }
+
+        if (cd.nextMaintHours > nextMaintHours)
+        {
+            JFrame message1 = new JFrame("");
+            JOptionPane.showMessageDialog(message1, "Next Maintenance Hours must be the same or larger than previously logged Next Maintenance Hours (" + cd.nextMaintHours + ").");
+            return false;
+        }
 
         ConcentratorState cState = ConcentratorState.getByName(locationComboBox.getSelectedItem().toString());
         if (cState == ConcentratorState.WITH_PATIENT && (locationDesc == null || locationDesc.isEmpty()))
@@ -214,10 +201,15 @@ public class AddConcentratorDialog extends JDialog {
 
         LocalDateTime time = LocalDateTime.parse(timeSpinner.getValue().toString(), formatter);
 
-        Concentrator concentrator = new Concentrator(serialNumber, make, model);
-        Database.addConcentrator(concentrator);
-        ConcentratorData cd = new ConcentratorData(currentHours, nextMaintHours, cState, locationDesc, time, mf.activeEmployee.name);
-        Database.addConcentratorLog(serialNumber, cd);
+        if (time.isBefore(cd.modificationDate))
+        {
+            JFrame message1 = new JFrame("");
+            JOptionPane.showMessageDialog(message1, "Date & Time must be newer than previously logged Date & Time.");
+            return false;
+        }
+
+        ConcentratorData concentratorData = new ConcentratorData(currentHours, nextMaintHours, cState, locationDesc, time, mf.activeEmployee.name);
+        Database.addConcentratorLog(this.concentrator.serialNumber, concentratorData);
         mf.reloadConcentratorTable();
         return true;
     }

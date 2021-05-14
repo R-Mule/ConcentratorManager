@@ -25,7 +25,8 @@ public class MainFrame extends javax.swing.JFrame {
     private JLabel versionHeader = new JLabel("Version 1.0", SwingConstants.LEFT);
     Timer timer;
     JTable table;
-    AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog();
+    AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog(this);
+    UpdateConcentratorDialog updateConcentratorDialog = new UpdateConcentratorDialog(this);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
@@ -196,8 +197,10 @@ public class MainFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(message1, "Concentrator retired. No state changes allowed.");
                     return;
                 }
-
-                //TODO
+                
+                Concentrator concentrator = Database.getConcentratorBySerialNumber(serialNumber);
+                updateConcentratorDialog.showDialog(concentrator);
+                
                 System.out.println();
             }
         });
@@ -313,12 +316,12 @@ public class MainFrame extends javax.swing.JFrame {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1)
         {
-            return table.getModel().getValueAt(selectedRow, LOCATION).toString().contentEquals(ConcentratorState.RETIRED.toString());
+            return table.getModel().getValueAt(selectedRow, LOCATION).toString().contentEquals(ConcentratorState.RETIRED.name);
         }
         return false;
     }
 
-    private void reloadConcentratorTable() {
+    public void reloadConcentratorTable() {
         ArrayList<Concentrator> concentrators = Database.getConcentrators();
         for (int c = 0; c < concentrators.size(); c++)
         {
@@ -335,7 +338,7 @@ public class MainFrame extends javax.swing.JFrame {
                     table.getModel().setValueAt(cd.nextMaintHours, r, NEXT_MAINTENANCE_HOURS);
                     table.getModel().setValueAt(cd.location.name, r, LOCATION);
                     table.getModel().setValueAt(cd.locationDesc, r, LOCATION_DESCRIPTION);
-                    table.getModel().setValueAt(cd.modificationDate, r, LAST_MODIFIED);
+                    table.getModel().setValueAt(cd.modificationDate.format(formatter), r, LAST_MODIFIED);
                     table.getModel().setValueAt(cd.loggedByEmployee, r, LOGGED_BY_EMPLOYEE);
                     found = true;
                 }
@@ -352,7 +355,7 @@ public class MainFrame extends javax.swing.JFrame {
         ConcentratorData cd = c.getLatestLog();
         Object[] rowData =
         {
-            c.serialNumber, c.make, c.model, cd.currentHours, cd.nextMaintHours, cd.location, cd.locationDesc, cd.modificationDate
+            c.serialNumber, c.make.name, c.model.name, cd.currentHours, cd.nextMaintHours, cd.location.name, cd.locationDesc, cd.modificationDate.format(formatter), cd.loggedByEmployee
         };
         tm.addRow(rowData);
     }

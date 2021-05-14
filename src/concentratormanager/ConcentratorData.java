@@ -21,6 +21,7 @@ public class ConcentratorData {
         this.currentHours = currentHours;
         this.nextMaintHours = nextMainHours;
         this.location = location;
+        this.locationDesc = locationDesc;
         this.loggedByEmployee = loggedByEmployee;
     }
     
