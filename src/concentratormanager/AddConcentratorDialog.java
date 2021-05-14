@@ -142,8 +142,10 @@ public class AddConcentratorDialog extends JDialog {
         JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "MM/dd/yy hh:mm:ss aa");
         timeSpinner.setEditor(timeEditor);
         timeSpinner.setValue(new Date());
+        serialNumberTextField.setText("");
         currentHoursTextField.setText("0");
         nextMaintHoursTextField.setText("10000");
+        serialNumberTextField.requestFocus();
 
         this.setVisible(true);
     }

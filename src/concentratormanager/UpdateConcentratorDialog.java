@@ -140,6 +140,7 @@ public class UpdateConcentratorDialog extends JDialog {
         this.serialNumberValueLabel.setText(concentrator.serialNumber);
         this.makeValueLabel.setText(concentrator.make.name);
         this.modelValueLabel.setText(concentrator.model.name);
+        currentHoursTextField.requestFocus();
         this.setVisible(true);
     }
 

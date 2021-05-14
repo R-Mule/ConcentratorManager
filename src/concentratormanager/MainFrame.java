@@ -27,6 +27,7 @@ public class MainFrame extends javax.swing.JFrame {
     JTable table;
     AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog(this);
     UpdateConcentratorDialog updateConcentratorDialog = new UpdateConcentratorDialog(this);
+    ConcentratorLogDialog concentratorLogDialog = new ConcentratorLogDialog();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
@@ -219,7 +220,32 @@ public class MainFrame extends javax.swing.JFrame {
                 System.out.println();
             }
         });
+        
+        showConcentratorLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (activeEmployee == null)
+                {
+                    JFrame message1 = new JFrame("");
+                    JOptionPane.showMessageDialog(message1, "You must login first.");
+                    return;
+                }
 
+                if (getSelectedConcentratorSerialNumber() == null)
+                {
+                    JFrame message1 = new JFrame("");
+                    JOptionPane.showMessageDialog(message1, "No Concentrator selected.");
+                    return;
+                }
+
+                String serialNumber = getSelectedConcentratorSerialNumber();
+                
+                Concentrator concentrator = Database.getConcentratorBySerialNumber(serialNumber);
+                concentratorLogDialog.showDialog(concentrator);
+                
+                System.out.println();
+            }
+        });
+        
         //Init Concentrator Table
         ArrayList<Concentrator> concentrators = Database.getConcentrators();
         int conCntr = 0;
@@ -249,12 +275,12 @@ public class MainFrame extends javax.swing.JFrame {
         table.setSize(1600, 1000);
         TableColumn column = null;
 
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < COLUMN_NAMES.length; i++)
         {
             column = table.getColumnModel().getColumn(i);
             if (i == 0 || i == 4 || i == 5 || i == 6)
             {
-                column.setPreferredWidth(200); //third column is bigger
+                column.setPreferredWidth(150); //third column is bigger
             }
             else
             {
