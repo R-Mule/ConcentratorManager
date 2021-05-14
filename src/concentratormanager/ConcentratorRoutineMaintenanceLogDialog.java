@@ -33,7 +33,7 @@ public class ConcentratorRoutineMaintenanceLogDialog extends JDialog {
         "Logged By"
     };
     
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a");
 
     final int DISINFECTED = 0;
     final int EXTERIOR_CLEANED = 1;

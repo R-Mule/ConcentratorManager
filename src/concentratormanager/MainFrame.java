@@ -29,7 +29,7 @@ public class MainFrame extends javax.swing.JFrame {
     UpdateConcentratorDialog updateConcentratorDialog = new UpdateConcentratorDialog(this);
     ConcentratorLogDialog concentratorLogDialog = new ConcentratorLogDialog();
     ConcentratorRoutineMaintenanceLogDialog concentratorRoutineMaintenanceLogDialog = new ConcentratorRoutineMaintenanceLogDialog();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
     JLabel employeeSelectionHeader = new JLabel("Active Clerk: NONE", SwingConstants.LEFT);
@@ -127,7 +127,7 @@ public class MainFrame extends javax.swing.JFrame {
         //This creates the showConcentratorRoutineMaintenanceLogButton
         showConcentratorRountineMaintenaceLogButton.setLocation(1720, 400);
         showConcentratorRountineMaintenaceLogButton.setSize(100, 100);
-        showConcentratorRountineMaintenaceLogButton.setBackground(new Color(101, 228, 242));
+        showConcentratorRountineMaintenaceLogButton.setBackground(new Color(229, 167, 167));
         showConcentratorRountineMaintenaceLogButton.setVisible(true);
         this.add(showConcentratorRountineMaintenaceLogButton);
 
@@ -325,15 +325,8 @@ public class MainFrame extends javax.swing.JFrame {
         for (int i = 0; i < COLUMN_NAMES.length; i++)
         {
             column = table.getColumnModel().getColumn(i);
-            if (i == 0 || i == 4 || i == 5 || i == 6)
-            {
-                column.setPreferredWidth(150); //third column is bigger
-            }
-            else
-            {
-                column.setPreferredWidth(50);
-            }
 
+                column.setPreferredWidth(150); //third column is bigger
         }
 
         table.setAutoCreateRowSorter(true);

@@ -36,6 +36,7 @@ public class UpdateConcentratorDialog extends JDialog {
     JLabel serialNumberValueLabel = new JLabel("");
     JLabel makeValueLabel = new JLabel("");
     JLabel modelValueLabel = new JLabel("");
+    ConcentratorRoutineMaintenanceLogChecklistDialog checklist;
 
     public UpdateConcentratorDialog(MainFrame mf) {
         this.setTitle("Update Concentrator Menu");
@@ -56,7 +57,7 @@ public class UpdateConcentratorDialog extends JDialog {
         pane.setSize(400, 400);
         this.setLocation(800, 200);
         this.mf = mf;
-
+        checklist = new ConcentratorRoutineMaintenanceLogChecklistDialog(mf);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (validateSave())
@@ -207,6 +208,15 @@ public class UpdateConcentratorDialog extends JDialog {
             JFrame message1 = new JFrame("");
             JOptionPane.showMessageDialog(message1, "Date & Time must be newer than previously logged Date & Time.");
             return false;
+        }
+
+        if (cd.location == ConcentratorState.IN_CLEAN_ROOM)
+        {
+            do
+            {
+                checklist.showDialog(this.concentrator.serialNumber, time);
+            }
+            while (!checklist.pass);
         }
 
         ConcentratorData concentratorData = new ConcentratorData(currentHours, nextMaintHours, cState, locationDesc, time, mf.activeEmployee.name);

@@ -30,7 +30,7 @@ public class ConcentratorLogDialog extends JDialog {
         "Logged By"
     };
     
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a");
 
     final int CURRENT_HOURS = 0;
     final int NEXT_MAINTENANCE_HOURS = 1;
