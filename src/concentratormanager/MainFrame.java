@@ -28,6 +28,7 @@ public class MainFrame extends javax.swing.JFrame {
     AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog(this);
     UpdateConcentratorDialog updateConcentratorDialog = new UpdateConcentratorDialog(this);
     ConcentratorLogDialog concentratorLogDialog = new ConcentratorLogDialog();
+    ConcentratorRoutineMaintenanceLogDialog concentratorRoutineMaintenanceLogDialog = new ConcentratorRoutineMaintenanceLogDialog();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
     JButton clerkLoginButton = new JButton("Clerk Login");
     JButton clerkLogoutButton = new JButton("Clerk Logout");
@@ -36,11 +37,14 @@ public class MainFrame extends javax.swing.JFrame {
     //05/07/2021 creating strings for formatted JButton labels
     String addConcentratorButtonText = "Add\nConcentrator";
     String showConcentratorLogButtonText = "Show\nConcentrator\nLog";
+    String showConcentratorRoutineMaintenanceLog = "Show Routine\nMaintenance\nLog";
     String editConcentratorButtonText = "Update\nConcentrator";
     //05/07/2021 adding concentrator utility buttons with labels:
     JButton addConcentratorButton = new JButton("<html>" + addConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
     JButton showConcentratorLogButton = new JButton("<html>" + showConcentratorLogButtonText.replaceAll("\\n", "<br>") + "</html>");
+    JButton showConcentratorRountineMaintenaceLogButton = new JButton("<html>" + showConcentratorRoutineMaintenanceLog.replaceAll("\\n", "<br>") + "</html>");
     JButton editConcentratorButton = new JButton("<html>" + editConcentratorButtonText.replaceAll("\\n", "<br>") + "</html>");
+    JButton refreshButton = new JButton("Refresh");
     final String[] COLUMN_NAMES =
     {
         "Serial #",
@@ -106,20 +110,33 @@ public class MainFrame extends javax.swing.JFrame {
         addConcentratorButton.setBackground(new Color(143, 247, 122));
         addConcentratorButton.setVisible(true);
         this.add(addConcentratorButton);
+        //This creates the editConcentratorButton
+        editConcentratorButton.setLocation(1720, 200);
+        editConcentratorButton.setSize(100, 100);
+        editConcentratorButton.setBackground(new Color(251, 255, 140));
+        editConcentratorButton.setVisible(true);
+        this.add(editConcentratorButton);
 
         //This creates the showConcentratorLogButton
-        showConcentratorLogButton.setLocation(1720, 200);
+        showConcentratorLogButton.setLocation(1720, 300);
         showConcentratorLogButton.setSize(100, 100);
         showConcentratorLogButton.setBackground(new Color(101, 228, 242));
         showConcentratorLogButton.setVisible(true);
         this.add(showConcentratorLogButton);
 
-        //This creates the editConcentratorButton
-        editConcentratorButton.setLocation(1720, 300);
-        editConcentratorButton.setSize(100, 100);
-        editConcentratorButton.setBackground(new Color(251, 255, 140));
-        editConcentratorButton.setVisible(true);
-        this.add(editConcentratorButton);
+        //This creates the showConcentratorRoutineMaintenanceLogButton
+        showConcentratorRountineMaintenaceLogButton.setLocation(1720, 400);
+        showConcentratorRountineMaintenaceLogButton.setSize(100, 100);
+        showConcentratorRountineMaintenaceLogButton.setBackground(new Color(101, 228, 242));
+        showConcentratorRountineMaintenaceLogButton.setVisible(true);
+        this.add(showConcentratorRountineMaintenaceLogButton);
+
+        //This creates the refresh page button
+        refreshButton.setLocation(1720, 500);
+        refreshButton.setSize(100, 100);
+        refreshButton.setBackground(new Color(216, 124, 249));
+        refreshButton.setVisible(true);
+        this.add(refreshButton);
 
         employeeSelectionHeader.setBounds(120, 925, 400, 30);
         employeeSelectionHeader.setVisible(true);
@@ -175,6 +192,12 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                reloadConcentratorTable();
+            }
+        });
+
         editConcentratorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (activeEmployee == null)
@@ -198,10 +221,10 @@ public class MainFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(message1, "Concentrator retired. No state changes allowed.");
                     return;
                 }
-                
+
                 Concentrator concentrator = Database.getConcentratorBySerialNumber(serialNumber);
                 updateConcentratorDialog.showDialog(concentrator);
-                
+
                 System.out.println();
             }
         });
@@ -214,13 +237,13 @@ public class MainFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(message1, "You must login first.");
                     return;
                 }
-                
+
                 addConcentratorDialog.showDialog();
 
                 System.out.println();
             }
         });
-        
+
         showConcentratorLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (activeEmployee == null)
@@ -238,14 +261,38 @@ public class MainFrame extends javax.swing.JFrame {
                 }
 
                 String serialNumber = getSelectedConcentratorSerialNumber();
-                
+
                 Concentrator concentrator = Database.getConcentratorBySerialNumber(serialNumber);
                 concentratorLogDialog.showDialog(concentrator);
-                
+
                 System.out.println();
             }
         });
-        
+        showConcentratorRountineMaintenaceLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (activeEmployee == null)
+                {
+                    JFrame message1 = new JFrame("");
+                    JOptionPane.showMessageDialog(message1, "You must login first.");
+                    return;
+                }
+
+                if (getSelectedConcentratorSerialNumber() == null)
+                {
+                    JFrame message1 = new JFrame("");
+                    JOptionPane.showMessageDialog(message1, "No Concentrator selected.");
+                    return;
+                }
+
+                String serialNumber = getSelectedConcentratorSerialNumber();
+
+                Concentrator concentrator = Database.getConcentratorBySerialNumber(serialNumber);
+                concentratorRoutineMaintenanceLogDialog.showDialog(concentrator);
+
+                System.out.println();
+            }
+        });
+
         //Init Concentrator Table
         ArrayList<Concentrator> concentrators = Database.getConcentrators();
         int conCntr = 0;

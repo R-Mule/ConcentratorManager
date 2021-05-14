@@ -34,6 +34,7 @@ public class AddConcentratorDialog extends JDialog {
     JComboBox locationComboBox = new JComboBox();
     JTextField locationDescTextField = new JTextField();
     JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
+    ConcentratorRoutineMaintenanceLogChecklistDialog checklist;
     MainFrame mf;
 
     public AddConcentratorDialog(MainFrame mf) {
@@ -55,7 +56,8 @@ public class AddConcentratorDialog extends JDialog {
         pane.setSize(400, 400);
         this.setLocation(800, 200);
         this.mf = mf;
-
+        checklist = new ConcentratorRoutineMaintenanceLogChecklistDialog(mf);
+        
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (validateSave())
@@ -217,8 +219,16 @@ public class AddConcentratorDialog extends JDialog {
         LocalDateTime time = LocalDateTime.parse(timeSpinner.getValue().toString(), formatter);
 
         Concentrator concentrator = new Concentrator(serialNumber, make, model);
-        Database.addConcentrator(concentrator);
         ConcentratorData cd = new ConcentratorData(currentHours, nextMaintHours, cState, locationDesc, time, mf.activeEmployee.name);
+        
+        if(cd.location == ConcentratorState.IN_CLEAN_ROOM)
+        {
+            do{
+            checklist.showDialog(serialNumber, time);
+            }while(!checklist.pass);
+        }
+        
+        Database.addConcentrator(concentrator);
         Database.addConcentratorLog(serialNumber, cd);
         mf.reloadConcentratorTable();
         return true;
