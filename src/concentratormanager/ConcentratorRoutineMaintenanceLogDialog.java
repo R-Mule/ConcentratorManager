@@ -58,7 +58,7 @@ public class ConcentratorRoutineMaintenanceLogDialog extends JDialog {
         this.setSize(1600, 900);
         pane.setSize(1600, 900);
         this.setLocation(100, 100);
-        Object[][] data = new Object[concentrator.logData.size()][COLUMN_NAMES.length];
+        Object[][] data = new Object[concentrator.rountineLogData.size()][COLUMN_NAMES.length];
         int cdCntr = 0;
         for (ConcentratorRoutineMaintenanceLog cd : concentrator.rountineLogData)
         {

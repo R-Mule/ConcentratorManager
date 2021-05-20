@@ -35,7 +35,7 @@ public class ConcentratorRoutineMaintenanceLogChecklistDialog extends JDialog {
     ConcentratorRoutineMaintenanceLog crmLog;
 
     public ConcentratorRoutineMaintenanceLogChecklistDialog(MainFrame mf) {
-        this.setTitle("Add Concentrator Menu");
+        this.setTitle("Routine Maintenance Checklist");
         JPanel pane = new JPanel();
         JLabel disinfectedLabel = new JLabel("Disinfected:");
         JLabel cleanExteriorLabel = new JLabel("Clean Exterior:");

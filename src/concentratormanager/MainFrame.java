@@ -22,7 +22,7 @@ import javax.swing.table.TableColumn;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private JLabel versionHeader = new JLabel("Version 1.0", SwingConstants.LEFT);
+    private JLabel versionHeader = new JLabel("Version 1.1", SwingConstants.LEFT);
     Timer timer;
     JTable table;
     AddConcentratorDialog addConcentratorDialog = new AddConcentratorDialog(this);

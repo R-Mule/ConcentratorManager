@@ -210,7 +210,7 @@ public class UpdateConcentratorDialog extends JDialog {
             return false;
         }
 
-        if (cd.location == ConcentratorState.IN_CLEAN_ROOM)
+        if (cState == ConcentratorState.IN_CLEAN_ROOM)
         {
             do
             {

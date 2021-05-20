@@ -157,7 +157,7 @@ public class AddConcentratorDialog extends JDialog {
     }
 
     public boolean validateSave() {
-        String serialNumber = serialNumberTextField.getText();
+        String serialNumber = serialNumberTextField.getText().toUpperCase();
         if (serialNumber.isEmpty() || Database.doesConcentratorExist(serialNumber))
         {
             JFrame message1 = new JFrame("");
